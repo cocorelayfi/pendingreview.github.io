@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onboarding Template Generator</title>
+    <style>
+        :root {
+    color-scheme: dark;
+}
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0d1117;
+            font-size: 16px;
+            margin: 0;
+            padding: 20px;
+            color: #e1e4e8;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: #161b22;
+            border-radius: 10px;
+            border: 1px solid #30363d;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #f0f6fc;
+            font-size: 2.2rem;
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #30363d;
+            padding-bottom: 15px;
+        }
+
+        .tools-section {
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            color: #f0f6fc;
+                font-weight: 600;
+    letter-spacing: 0.3px;
+    margin-bottom: 15px;
+        }
+
+/* Admin Signals - Relay Financial green */
+.tools-section > h2:nth-of-type(1) {
+    color: #00A859; /* Relay Financial green */
+}
+
+/* Vouched - Purple matching Vouched ID */
+.tools-section > h2:nth-of-type(2) {
+    color: #8a2be2; /* Purple color */
+}
+
+/* Castle - Blue matching Castle IO */
+.tools-section > h2:nth-of-type(3) {
+    color: #1e90ff; /* Castle blue */
+}
+
+/* Sardine - Blue matching Sardine AI */
+.tools-section > h2:nth-of-type(4) {
+    color: #007bff; /* Sardine blue */
+}
+
+/* General Flags - Deep but visible yellow */
+.tools-section > h2:nth-of-type(5) {
+    color: #FFB300; /* Deep visible yellow */
+}
+
+        .tag-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tag-button {
+            font-size: 1rem;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .tag-button.inactive {
+    background-color: #2d333b; /* Darker grey */
+    color: #adbac7;
+    border: 1px solid #444c56;
+}
+
+.tag-button.active.low-risk {
+    background-color: #238636; /* GitHub green */
+    color: white;
+}
+
+.tag-button.active.medium-risk {
+    background-color: #d29922; /* GitHub yellow */
+    color: #0d1117; /* Dark text for contrast */
+}
+
+.tag-button.active.high-risk {
+    background-color: #da3633; /* GitHub red */
+    color: white;
+}
+
+.decision-button {
+    font-size: 1rem;
+    padding: 12px 20px;
+    border: 2px solid #388bfd;
+    border-radius: 5px;
+    background-color: transparent;
+    color: #388bfd;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.decision-button.selected {
+    background-color: #388bfd;
+    color: white;
+}
+
+.decision-button[data-decision="approve"] { border-color: #2ecc71; color: #2ecc71; }
+.decision-button[data-decision="approve"].selected { background-color: #2ecc71; color: white; }
+
+.decision-button[data-decision="reachout"] { border-color: #f39c12; color: #f39c12; }
+.decision-button[data-decision="reachout"].selected { background-color: #f39c12; color: white; }
+
+.decision-button[data-decision="reject"] { border-color: #e74c3c; color: #e74c3c; }
+.decision-button[data-decision="reject"].selected { background-color: #e74c3c; color: white; }
+
+.tier-button {
+    background-color: transparent;
+    border: 2px solid #6e7681;
+    color: #adbac7;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.tier-button.selected {
+    background-color: #388bfd;
+    border-color: #388bfd;
+    color: white;
+}
+
+.tag-button:hover, .decision-button:hover, .tier-button:hover, .action-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.tag-button:active, .decision-button:active, .tier-button:active, .action-button:active {
+    transform: translateY(0);
+}
+
+        .notes-section {
+            background-color: #1c2128;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+
+#generatedNotes {
+    min-height: 150px;
+    background-color: #22272e;
+    color: #adbac7;
+    border: 1px solid #444c56;
+    border-radius: 5px;
+    padding: 15px;
+    white-space: pre-wrap;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    /* Add these lines for better editable appearance */
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+textarea {
+    background-color: #2d2d2d;
+    color: #768390;
+    border: 1px solid #444;
+}
+
+textarea::placeholder {
+    color: #888;
+}
+
+#generatedNotes:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+#socialLinksInput {
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .action-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        #copyButton {
+            background-color: #3498db;
+            color: white;
+        }
+
+        #clearButton {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .action-button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .tool-icon {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Pending Review Template</h1>
+
+        <div class="tools-section">
+
+            <h2>Admin:</h2>
+             <div class="tag-buttons" id="adminTags">
+                <!-- Admin tags will be added here by JavaScript -->
+            </div>
+
+            <h2>Vouched:</h2>
+            <div class="tag-buttons" id="vouchedTags">
+                <!-- Vouched tags will be added here by JavaScript -->
+            </div>
+
+            <h2>Castle:</h2>
+            <div class="tag-buttons" id="castleTags">
+                <!-- Castle tags will be added here by JavaScript -->
+            </div>
+
+            <h2>Sardine:</h2>
+            <div class="tag-buttons" id="sardineTags">
+                <!-- Sardine tags will be added here by JavaScript -->
+            </div>
+
+            <h2>General Flags:</h2>
+            <div class="tag-buttons" id="generalTags">
+                <!-- General tags will be added here by JavaScript -->
+            </div>
+
+            <div id="castleRulesSection" style="display: none; margin-top: 15px;">
+    <h2>Castle Suspicious Login Rules</h2>
+    <textarea id="castleRulesInput" placeholder="Enter Castle suspicious login rules (one per line). Example: 'Multiple failed login attempts', 'Login from new device', etc."
+              style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 80px; resize: vertical; font-family: inherit;"></textarea>
+</div>
+            <div id="sardineRulesSection" style="display: none; margin-top: 15px;">
+    <h2>Sardine Suspicious Rules</h2>
+    <textarea id="sardineRulesInput" placeholder="Enter Sardine suspicious rules (one per line). Example: 'High Email Risk Score (From ML Model)', 'Disposable Email Domain', etc."
+              style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 80px; resize: vertical; font-family: inherit;"></textarea>
+</div>
+          <div id="socialLinksSection" style="display: none; margin-top: 15px;">
+    <h2>Social Media Links</h2>
+    <textarea id="socialLinksInput" placeholder="Enter social media links (e.g., LinkedIn, Facebook URLs). You can paste multiple links, one per line."
+              style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 80px; resize: vertical; font-family: inherit;"></textarea>
+</div>
+<div id="adverseMediaSection" style="display: none; margin-top: 15px;">
+    <h2>Adverse Media Links</h2>
+    <textarea id="adverseMediaInput" placeholder="Enter adverse media links or sources. You can paste multiple links, one per line."
+              style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 80px; resize: vertical; font-family: inherit;"></textarea>
+</div>
+                        <div id="riskSuggestion" style="margin-top: 10px; font-weight: 600; font-size: 0.9rem; color: #adbac7; min-height: 20px;"></div>
+
+        </div> <!-- This closes the tools-section div -->
+
+        <!-- Moved Analyst Decision section to tools section -->
+        <div class="analyst-decision-section" style="margin-bottom: 20px; padding: 15px; background-color: #252525; border-radius: 8px;">
+            <h2>Analyst Decision</h2>
+
+            <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+                <button class="decision-button" data-decision="approve">Approve</button>
+                <button class="decision-button" data-decision="reachout">Reach Out</button>
+                <button class="decision-button" data-decision="reject">Reject</button>
+            </div>
+
+            <div id="tierSelection" style="display: none;">
+                <h3>Approval Tier</h3>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="tier-button" data-tier="D">Tier D</button>
+                    <button class="tier-button" data-tier="C">Tier C</button>
+                    <button class="tier-button" data-tier="B">Tier B</button>
+                    <button class="tier-button" data-tier="A">Tier A</button>
+                    <button class="tier-button" data-tier="S">Tier S</button>
+                </div>
+            </div>
+
+            <div id="decisionSummary" style="margin-top: 15px; font-weight: 600; min-height: 20px;"></div>
+        </div>
+
+        <div class="notes-section">
+            <!-- Moved Action Buttons to be above the notes -->
+            <div class="action-buttons">
+                <button class="action-button" id="copyButton">Copy Notes</button>
+                <button class="action-button" id="clearButton">Clear All</button>
+            </div>
+
+            <!-- Generated Notes section stays at the bottom -->
+            <h2>Generated Notes</h2>
+            <div id="generatedNotes" contenteditable="true">No tags selected. Click on the buttons above to generate notes.</div>
+        </div>
+
+       <script>
+        // Define tags for each tool
+        const tags = {
+            admin: [
+                { id: 'admin_good_referral', text: 'Good Referral Code' },
+                { id: 'admin_related_approved', text: 'Related Organization Approved' },
+                { id: 'admin_related_rejected', text: 'Related Organization Rejected/Off-Boarded' },
+                { id: 'admin_business_description', text: 'Suspicious Business Description' },
+                { id: 'admin_high_risk_industry', text: 'High Risk Industry' },
+                { id: 'admin_prohibited_industry', text: 'Prohibited Industry' },
+            ],
+            vouched: [
+                { id: 'vouched_no_flags', text: 'Selfie/ID Verified' },
+                { id: 'vouched_image_quality', text: 'Poor Image Quality' },
+                { id: 'vouched_not_real', text: 'Fake Selfie or ID' },
+            ],
+            castle: [
+                { id: 'castle_no_flags', text: 'Standard Login Activity' },
+                { id: 'castle_suspicious_login', text: 'Suspicious Login Activity' },
+                { id: 'castle_prohibited_country', text: 'Prohibited Country Login' },
+            ],
+            sardine: [
+                { id: 'sardine_no_flags', text: 'Standard Sardine Flags' },
+                { id: 'sardine_suspicious_flags', text: 'Suspicious Sardine Flags' },
+            ],
+            general: [
+                { id: 'general_good_socials', text: 'Good Socials/Online Presence' },
+                { id: 'general_adverse_media', text: 'Adverse Media Found' },
+                { id: 'general_email', text: 'Suspicious Business Email' },
+                { id: 'general_sole_proprietor', text: 'Sole Proprietor' },
+                { id: 'general_fraud_ring', text: 'Fraud Ring' },
+            ]
+        };
+
+        // Define note templates for each tag
+        const noteTemplates = {
+            admin_good_referral: "✅ Referral code by sales or generally seen on approved accounts.",
+            admin_related_approved: "✅ Related organization was manually or auto-approved.",
+            admin_related_rejected: "🚨 Related organization was manually or auto-rejected/off-boarded.",
+            admin_business_description: "⚠️ Suspicious or generic business description.",
+            admin_high_risk_industry: "⚠️ Applicant operates in a high-risk industry.",
+            admin_prohibited_industry: "🚨 Prohibited industry identified.",
+            vouched_no_flags: "✅ Selfie and ID verification has no discernible flags.",
+            vouched_image_quality: "⚠️ Poor Image quality noted in Vouched verification.",
+            vouched_not_real: "🚨 Selfie or ID appears to be fake or manipulated.",
+            castle_no_flags: "✅ No suspicious login activity detected by Castle.",
+            castle_suspicious_login: "⚠️ Suspicious login activity detected by Castle.",
+            castle_prohibited_country: "🚨Login from prohibited country detected by Castle.",
+            sardine_no_flags: "✅ No fraud indicators detected by Sardine.",
+            sardine_suspicious_flags: "⚠️ Multiple suspicious flags raised by Sardine.",
+            general_good_socials: "✅ Positive online presence found.",
+            general_adverse_media: "⚠️ Adverse media found during background check.",
+            general_email: "⚠️ Suspicious or unrelated business email.",
+            general_sole_proprietor: "⚠️ Applicant is a sole proprietorship - higher risk entity type noted.",
+            general_fraud_ring: "🚨 Potential fraud ring association.",
+        };
+
+        // Track active tags
+        let activeTags = new Set();
+        let analystDecision = { action: null, tier: null };
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create tag buttons for each tool
+            createTagButtons('adminTags', tags.admin);
+            createTagButtons('vouchedTags', tags.vouched);
+            createTagButtons('castleTags', tags.castle);
+            createTagButtons('sardineTags', tags.sardine);
+            createTagButtons('generalTags', tags.general);
+
+            // Add event listeners for action buttons
+            document.getElementById('copyButton').addEventListener('click', copyNotes);
+            document.getElementById('clearButton').addEventListener('click', clearAllTags);
+
+            // Add event listeners for text inputs
+            document.getElementById('castleRulesInput').addEventListener('input', updateNotes);
+            document.getElementById('sardineRulesInput').addEventListener('input', updateNotes);
+            document.getElementById('socialLinksInput').addEventListener('input', updateNotes);
+            document.getElementById('adverseMediaInput').addEventListener('input', updateNotes);
+
+            // Add event listeners for decision buttons
+            document.querySelectorAll('.decision-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    handleDecisionClick(this.dataset.decision);
+                });
+            });
+
+            // Add event listeners for tier buttons
+            document.querySelectorAll('.tier-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    handleTierClick(this.dataset.tier);
+                });
+            });
+
+            // Update notes display initially
+            updateNotes();
+            updateRiskSuggestion();
+        });
+
+        // Function to create tag buttons
+        function createTagButtons(containerId, tagList) {
+            const container = document.getElementById(containerId);
+            tagList.forEach(tag => {
+                const button = document.createElement('button');
+                button.className = 'tag-button inactive';
+                button.id = tag.id;
+                button.innerHTML = `<span class="tool-icon">+</span> ${tag.text}`;
+                button.addEventListener('click', function() {
+                    toggleTag(tag.id);
+                });
+                container.appendChild(button);
+            });
+        }
+
+        // Function to toggle a tag's active state
+        function toggleTag(tagId) {
+            const button = document.getElementById(tagId);
+            const tagText = tags.admin.concat(tags.vouched, tags.castle, tags.sardine, tags.general)
+                .find(tag => tag.id === tagId).text;
+
+            if (activeTags.has(tagId)) {
+                // Remove tag
+                activeTags.delete(tagId);
+                button.className = 'tag-button inactive';
+                button.innerHTML = `<span class="tool-icon">+</span> ${tagText}`;
+            } else {
+                // Add tag
+                activeTags.add(tagId);
+
+                // Determine risk level based on emoji in note template
+                const noteTemplate = noteTemplates[tagId];
+                let riskClass = 'low-risk'; // Default to low risk
+
+                if (noteTemplate.includes('🚨')) {
+                    riskClass = 'high-risk';
+                } else if (noteTemplate.includes('⚠️')) {
+                    riskClass = 'medium-risk';
+                }
+
+                button.className = `tag-button active ${riskClass}`;
+                button.innerHTML = `<span class="tool-icon">-</span> ${tagText}`;
+            }
+
+            // Show/hide castle rules input
+const castleRulesSection = document.getElementById('castleRulesSection');
+if (tagId === 'castle_suspicious_login' && activeTags.has('castle_suspicious_login')) {
+    castleRulesSection.style.display = 'block';
+} else if (tagId === 'castle_suspicious_login' && !activeTags.has('castle_suspicious_login')) {
+    castleRulesSection.style.display = 'none';
+    document.getElementById('castleRulesInput').value = '';
+}
+
+            // Show/hide sardine rules input
+            const sardineRulesSection = document.getElementById('sardineRulesSection');
+            if (tagId === 'sardine_suspicious_flags' && activeTags.has('sardine_suspicious_flags')) {
+                sardineRulesSection.style.display = 'block';
+            } else if (tagId === 'sardine_suspicious_flags' && !activeTags.has('sardine_suspicious_flags')) {
+                sardineRulesSection.style.display = 'none';
+                document.getElementById('sardineRulesInput').value = '';
+            }
+
+            // Show/hide social links input
+            const socialLinksSection = document.getElementById('socialLinksSection');
+            if (tagId === 'general_good_socials' && activeTags.has('general_good_socials')) {
+                socialLinksSection.style.display = 'block';
+            } else if (tagId === 'general_good_socials' && !activeTags.has('general_good_socials')) {
+                socialLinksSection.style.display = 'none';
+                document.getElementById('socialLinksInput').value = '';
+            }
+
+            // Show/hide adverse media input
+            const adverseMediaSection = document.getElementById('adverseMediaSection');
+            if (tagId === 'general_adverse_media' && activeTags.has('general_adverse_media')) {
+                adverseMediaSection.style.display = 'block';
+            } else if (tagId === 'general_adverse_media' && !activeTags.has('general_adverse_media')) {
+                adverseMediaSection.style.display = 'none';
+                document.getElementById('adverseMediaInput').value = '';
+            }
+
+            updateNotes();
+            updateRiskSuggestion();
+        }
+
+        // Handle decision button clicks
+        function handleDecisionClick(decision) {
+            analystDecision.action = decision;
+            analystDecision.tier = null;
+
+            // Update button states
+            document.querySelectorAll('.decision-button').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.querySelector(`[data-decision="${decision}"]`).classList.add('selected');
+
+            // Show/hide tier selection
+            const tierSelection = document.getElementById('tierSelection');
+            if (decision === 'approve') {
+                tierSelection.style.display = 'block';
+            } else {
+                tierSelection.style.display = 'none';
+                document.querySelectorAll('.tier-button').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+            }
+
+            updateDecisionSummary();
+            updateNotes();
+        }
+
+        // Handle tier button clicks
+        function handleTierClick(tier) {
+            analystDecision.tier = tier;
+            document.querySelectorAll('.tier-button').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.querySelector(`[data-tier="${tier}"]`).classList.add('selected');
+            updateDecisionSummary();
+            updateNotes();
+        }
+
+        // Update decision summary display
+        function updateDecisionSummary() {
+            const summary = document.getElementById('decisionSummary');
+            if (analystDecision.action) {
+                let text = `Decision: ${analystDecision.action.toUpperCase()}`;
+                if (analystDecision.action === 'approve' && analystDecision.tier) {
+                    text += ` - Tier ${analystDecision.tier}`;
+                }
+                summary.textContent = text;
+            } else {
+                summary.textContent = '';
+            }
+        }
+
+        // Update risk suggestion display
+        function updateRiskSuggestion() {
+            const suggestion = document.getElementById('riskSuggestion');
+
+            // Count risk indicators
+            const riskCount = Array.from(activeTags).filter(tag =>
+                noteTemplates[tag].includes('⚠️') || noteTemplates[tag].includes('🚨')
+            ).length;
+
+            const criticalCount = Array.from(activeTags).filter(tag =>
+                noteTemplates[tag].includes('🚨')
+            ).length;
+
+            if (activeTags.size === 0) {
+                suggestion.textContent = '';
+            } else if (criticalCount > 0) {
+                // 🚨 HIGH RISK takes priority over everything
+                suggestion.textContent = `🚨 HIGH RISK SUGGESTION: ${criticalCount} critical alert(s) detected. Consider rejection or further investigation.`;
+                suggestion.style.color = '#e74c3c';
+            } else if (riskCount > 0 && !activeTags.has('general_good_socials')) {
+                // ⚠️ MEDIUM RISK unless Good Socials is selected
+                suggestion.textContent = `⚠️ MEDIUM RISK SUGGESTION: ${riskCount} warning(s) noted. Additional verification recommended.`;
+                suggestion.style.color = '#f39c12';
+            } else {
+                // ✅ LOW RISK (either no risks or Good Socials overrides medium risks)
+                suggestion.textContent = `✅ LOW RISK SUGGESTION: No significant fraud indicators detected. Approval suggested.`;
+                suggestion.style.color = '#2ecc71';
+            }
+        }
+
+        // Function to update the generated notes
+        function updateNotes() {
+            const notesContainer = document.getElementById('generatedNotes');
+
+            if (activeTags.size === 0) {
+                notesContainer.textContent = "No tags selected. Click on the buttons above to generate notes.";
+                return;
+            }
+
+            let notes = "PENDING NOTES:\n\n";
+
+            // Group notes by tool
+            const toolNotes = {
+                admin: [],
+                vouched: [],
+                castle: [],
+                sardine: [],
+                general: []
+            };
+
+            // Sort tags by tool
+            activeTags.forEach(tagId => {
+                if (tagId.startsWith('admin_')) {
+                    toolNotes.admin.push(noteTemplates[tagId]);
+                } else if (tagId.startsWith('vouched_')) {
+                    toolNotes.vouched.push(noteTemplates[tagId]);
+                } else if (tagId.startsWith('castle_')) {
+                    toolNotes.castle.push(noteTemplates[tagId]);
+                } else if (tagId.startsWith('sardine_')) {
+                    toolNotes.sardine.push(noteTemplates[tagId]);
+                } else if (tagId.startsWith('general_')) {
+                    toolNotes.general.push(noteTemplates[tagId]);
+                }
+            });
+
+            // Add notes for each tool if they have any
+            if (toolNotes.admin.length > 0) {
+                notes += "ADMIN FINDINGS:\n";
+                toolNotes.admin.forEach(note => {
+                    notes += `• ${note}\n`;
+                });
+                notes += "\n";
+            }
+
+            if (toolNotes.vouched.length > 0) {
+                notes += "VOCHED ANALYSIS:\n";
+                toolNotes.vouched.forEach(note => {
+                    notes += `• ${note}\n`;
+                });
+                notes += "\n";
+            }
+
+            if (toolNotes.castle.length > 0) {
+                notes += "CASTLE ANALYSIS:\n";
+                toolNotes.castle.forEach(note => {
+                    notes += `• ${note}\n`;
+                });
+                notes += "\n";
+            }
+
+            if (toolNotes.castle.length > 0) {
+    notes += "CASTLE ANALYSIS:\n";
+    toolNotes.castle.forEach(note => {
+        notes += `• ${note}\n`;
+    });
+
+    // Add castle rules if Suspicious Login Activity is selected and rules are provided
+    if (activeTags.has('castle_suspicious_login')) {
+        const castleRules = document.getElementById('castleRulesInput').value.trim();
+        if (castleRules) {
+            const rulesArray = castleRules.split('\n').filter(rule => rule.trim() !== '');
+            if (rulesArray.length > 0) {
+                notes += `• Castle Suspicious Login Rules Detected:\n`;
+                rulesArray.forEach(rule => {
+                    notes += `  - ${rule.trim()}\n`;
+                });
+            }
+        }
+    }
+    notes += "\n";
+}
+
+            if (toolNotes.sardine.length > 0) {
+                notes += "SARDINE ANALYSIS:\n";
+                toolNotes.sardine.forEach(note => {
+                    notes += `• ${note}\n`;
+                });
+
+                // Add sardine rules if Suspicious Flags is selected and rules are provided
+                if (activeTags.has('sardine_suspicious_flags')) {
+                    const sardineRules = document.getElementById('sardineRulesInput').value.trim();
+                    if (sardineRules) {
+                        const rulesArray = sardineRules.split('\n').filter(rule => rule.trim() !== '');
+                        if (rulesArray.length > 0) {
+                            notes += `• Sardine Suspicious Rules Detected:\n`;
+                            rulesArray.forEach(rule => {
+                                notes += `  - ${rule.trim()}\n`;
+                            });
+                        }
+                    }
+                }
+                notes += "\n";
+            }
+
+if (toolNotes.general.length > 0) {
+    toolNotes.general.forEach(note => {
+        notes += `• ${note}\n`;
+    });
+
+                // Add social links if Good Socials is selected
+                if (activeTags.has('general_good_socials')) {
+                    const socialLinks = document.getElementById('socialLinksInput').value.trim();
+                    if (socialLinks) {
+                        const linksArray = socialLinks.split('\n').filter(link => link.trim() !== '');
+                        if (linksArray.length > 0) {
+                            notes += `• Social Media Links:\n`;
+                            linksArray.forEach(link => {
+                                notes += `  - ${link.trim()}\n`;
+                            });
+                        }
+                    }
+                }
+
+                // Add adverse media links if Adverse Media is selected
+                if (activeTags.has('general_adverse_media')) {
+                    const adverseMediaLinks = document.getElementById('adverseMediaInput').value.trim();
+                    if (adverseMediaLinks) {
+                        const linksArray = adverseMediaLinks.split('\n').filter(link => link.trim() !== '');
+                        if (linksArray.length > 0) {
+                            notes += `• Adverse Media Sources:\n`;
+                            linksArray.forEach(link => {
+                                notes += `  - ${link.trim()}\n`;
+                            });
+                        }
+                    }
+                }
+                notes += "\n";
+            }
+
+            // Add analyst decision to the notes if one is made
+            if (analystDecision.action) {
+                notes += `\nANALYST DECISION: ${analystDecision.action.toUpperCase()}`;
+                if (analystDecision.action === 'approve' && analystDecision.tier) {
+                    notes += ` - TIER ${analystDecision.tier}`;
+                }
+                notes += "\n\n";
+            }
+
+            notesContainer.textContent = notes;
+        }
+
+        // Function to copy notes to clipboard
+        function copyNotes() {
+            const notesText = document.getElementById('generatedNotes').innerText;
+            navigator.clipboard.writeText(notesText).then(() => {
+                const originalText = document.getElementById('copyButton').textContent;
+                document.getElementById('copyButton').textContent = "Copied!";
+                setTimeout(() => {
+                    document.getElementById('copyButton').textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+                alert('Failed to copy notes to clipboard. Please select and copy manually.');
+            });
+        }
+
+        // Function to clear all tags
+        function clearAllTags() {
+            activeTags.clear();
+
+            // Reset all buttons to inactive state
+            document.querySelectorAll('.tag-button').forEach(button => {
+                button.className = 'tag-button inactive';
+                const tagId = button.id;
+                const tagText = tags.admin.concat(tags.vouched, tags.castle, tags.sardine, tags.general)
+                    .find(tag => tag.id === tagId).text;
+                button.innerHTML = `<span class="tool-icon">+</span> ${tagText}`;
+            });
+
+            // Hide all input sections and clear inputs
+            document.getElementById('castleRulesSection').style.display = 'none';
+document.getElementById('castleRulesInput').value = '';
+            document.getElementById('sardineRulesSection').style.display = 'none';
+            document.getElementById('sardineRulesInput').value = '';
+            document.getElementById('socialLinksSection').style.display = 'none';
+            document.getElementById('socialLinksInput').value = '';
+            document.getElementById('adverseMediaSection').style.display = 'none';
+            document.getElementById('adverseMediaInput').value = '';
+
+            // Clear analyst decision
+            analystDecision = { action: null, tier: null };
+            document.querySelectorAll('.decision-button, .tier-button').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.getElementById('tierSelection').style.display = 'none';
+            document.getElementById('decisionSummary').textContent = '';
+
+            updateNotes();
+            updateRiskSuggestion();
+        }
+    </script>
+</body>
+</html>
