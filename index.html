@@ -7,6 +7,7 @@
     <style>
         :root {
     color-scheme: dark;
+
 }
         * {
             box-sizing: border-box;
@@ -72,6 +73,11 @@
     color: #007bff; /* Sardine blue */
 }
 
+/* Online Presence/Socials - Choose a color (I suggest a teal/cyan) */
+.tools-section > h2:nth-of-type(6) {
+    color: #00bcd4; /* Cyan/Teal */
+}
+
 /* General Flags - Deep but visible yellow */
 .tools-section > h2:nth-of-type(5) {
     color: #FFB300; /* Deep visible yellow */
@@ -97,10 +103,23 @@
             gap: 5px;
         }
 
-        .tag-button.inactive {
-    background-color: #2d333b; /* Darker grey */
-    color: #adbac7;
-    border: 1px solid #444c56;
+.tag-button.inactive {
+    background-color: #2d333b !important; /* Darker grey */
+    color: #adbac7 !important;
+    border: 1px solid #444c56 !important;
+}
+
+/* Style for N/A buttons */
+.tag-button[data-na="true"] {
+    background-color: #495057 !important; /* Dark grey */
+    color: #adbac7 !important;
+    border: 1px solid #6c757d !important;
+}
+
+.tag-button[data-na="true"].active {
+    background-color: #6c757d !important; /* Medium grey when active */
+    color: white !important;
+    border: 1px solid #adbac7 !important;
 }
 
 .tag-button.active.low-risk {
@@ -196,8 +215,9 @@
 
 textarea {
     background-color: #2d2d2d;
-    color: #768390;
+    color: #adbac7; /* Consistent with other text */
     border: 1px solid #444;
+    border-radius: 5px; /* Add for consistency */
 }
 
 textarea::placeholder {
@@ -257,7 +277,7 @@ textarea::placeholder {
 
         <div class="tools-section">
 
-            <h2>Admin:</h2>
+            <h2>Related Organizations:</h2>
              <div class="tag-buttons" id="adminTags">
                 <!-- Admin tags will be added here by JavaScript -->
             </div>
@@ -277,7 +297,12 @@ textarea::placeholder {
                 <!-- Sardine tags will be added here by JavaScript -->
             </div>
 
-            <h2>General Flags:</h2>
+            <h2>Online Presence/Socials:</h2>
+            <div class="tag-buttons" id="socialTags">
+                <!-- Social tags will be added here by JavaScript -->
+            </div>
+
+            <h2>General:</h2>
             <div class="tag-buttons" id="generalTags">
                 <!-- General tags will be added here by JavaScript -->
             </div>
@@ -343,60 +368,70 @@ textarea::placeholder {
         </div>
 
        <script>
+
         // Define tags for each tool
         const tags = {
             admin: [
-                { id: 'admin_good_referral', text: 'Good Referral Code' },
                 { id: 'admin_related_approved', text: 'Related Organization Approved' },
                 { id: 'admin_related_rejected', text: 'Related Organization Rejected/Off-Boarded' },
-                { id: 'admin_business_description', text: 'Suspicious Business Description' },
-                { id: 'admin_high_risk_industry', text: 'High Risk Industry' },
-                { id: 'admin_prohibited_industry', text: 'Prohibited Industry' },
+                { id: 'admin_related_NA', text: 'N/A' },
             ],
             vouched: [
                 { id: 'vouched_no_flags', text: 'Selfie/ID Verified' },
-                { id: 'vouched_image_quality', text: 'Poor Image Quality' },
-                { id: 'vouched_not_real', text: 'Fake Selfie or ID' },
+                { id: 'vouched_not_real', text: 'Fake Selfie/ID' },
+                { id: 'vouched_NA', text: 'N/A' },
             ],
             castle: [
-                { id: 'castle_no_flags', text: 'Standard Login Activity' },
-                { id: 'castle_suspicious_login', text: 'Suspicious Login Activity' },
-                { id: 'castle_prohibited_country', text: 'Prohibited Country Login' },
+                { id: 'castle_no_flags', text: 'Standard Login' },
+                { id: 'castle_suspicious_login', text: 'Suspicious Signals' },
+                { id: 'castle_NA', text: 'N/A' },
             ],
             sardine: [
-                { id: 'sardine_no_flags', text: 'Standard Sardine Flags' },
-                { id: 'sardine_suspicious_flags', text: 'Suspicious Sardine Flags' },
+                { id: 'sardine_no_flags', text: 'Standard Login' },
+                { id: 'sardine_suspicious_flags', text: 'Suspicious Rules' },
+                { id: 'sardine_NA', text: 'N/A' },
+            ],
+
+             social: [
+                { id: 'social_good_socials', text: 'Socials/Online Presence Found' },
+                { id: 'social_adverse_media', text: 'Adverse Media Found' },
+                { id: 'social_NA', text: 'N/A' },
             ],
             general: [
-                { id: 'general_good_socials', text: 'Good Socials/Online Presence' },
-                { id: 'general_adverse_media', text: 'Adverse Media Found' },
+                { id: 'general_good_referral', text: 'Trusted Referral Code' },
                 { id: 'general_email', text: 'Suspicious Business Email' },
+                { id: 'general_business_description', text: 'Suspicious Business Description' },
+                { id: 'general_high_risk_industry', text: 'High Risk Industry' },
+                { id: 'general_prohibited_industry', text: 'Prohibited Industry' },
+                { id: 'general_prohibited_country', text: 'Prohibited Country Login' },
                 { id: 'general_sole_proprietor', text: 'Sole Proprietor' },
-                { id: 'general_fraud_ring', text: 'Fraud Ring' },
             ]
         };
 
         // Define note templates for each tag
         const noteTemplates = {
-            admin_good_referral: "✅ Referral code by sales or generally seen on approved accounts.",
-            admin_related_approved: "✅ Related organization was manually or auto-approved.",
-            admin_related_rejected: "🚨 Related organization was manually or auto-rejected/off-boarded.",
-            admin_business_description: "⚠️ Suspicious or generic business description.",
-            admin_high_risk_industry: "⚠️ Applicant operates in a high-risk industry.",
-            admin_prohibited_industry: "🚨 Prohibited industry identified.",
-            vouched_no_flags: "✅ Selfie and ID verification has no discernible flags.",
-            vouched_image_quality: "⚠️ Poor Image quality noted in Vouched verification.",
-            vouched_not_real: "🚨 Selfie or ID appears to be fake or manipulated.",
-            castle_no_flags: "✅ No suspicious login activity detected by Castle.",
-            castle_suspicious_login: "⚠️ Suspicious login activity detected by Castle.",
-            castle_prohibited_country: "🚨Login from prohibited country detected by Castle.",
-            sardine_no_flags: "✅ No fraud indicators detected by Sardine.",
-            sardine_suspicious_flags: "⚠️ Multiple suspicious flags raised by Sardine.",
-            general_good_socials: "✅ Positive online presence found.",
-            general_adverse_media: "⚠️ Adverse media found during background check.",
+            admin_related_approved: "✅ Related organization was manually/auto-approved.",
+            admin_related_rejected: "🚨 Related organization was off-boarded or manually/auto-rejected.",
+            admin_related_NA: "N/A",
+            vouched_no_flags: "✅ Selfie/ID has no discernible flags.",
+            vouched_not_real: "🚨 Selfie/ID appears to be fake or manipulated.",
+            vouched_NA: "N/A",
+            castle_no_flags: "✅ No suspicious login activity detected.",
+            castle_suspicious_login: "⚠️ Signals detected:",
+            castle_NA: "N/A",
+            sardine_no_flags: "✅ No fraudulent rules triggered.",
+            sardine_suspicious_flags: "⚠️ Rules triggered:",
+            sardine_NA: "N/A",
+            social_good_socials: "✅ Good online presence/socials found:",
+            social_adverse_media: "⚠️ Adverse media found:",
+            social_NA: "N/A",
+            general_good_referral: "✅ Referral code by sales.",
             general_email: "⚠️ Suspicious or unrelated business email.",
-            general_sole_proprietor: "⚠️ Applicant is a sole proprietorship - higher risk entity type noted.",
-            general_fraud_ring: "🚨 Potential fraud ring association.",
+            general_business_description: "⚠️ Suspicious or generic business description.",
+            general_high_risk_industry: "⚠️ Business is under a high-risk industry.",
+            general_prohibited_industry: "🚨 Business is under a prohibited industry.",
+            general_prohibited_country: "🚨 Login from a prohibited country.",
+            general_sole_proprietor: "⚠️ Applicant is a sole proprietorship.",
         };
 
         // Track active tags
@@ -410,6 +445,7 @@ textarea::placeholder {
             createTagButtons('vouchedTags', tags.vouched);
             createTagButtons('castleTags', tags.castle);
             createTagButtons('sardineTags', tags.sardine);
+            createTagButtons('socialTags', tags.social);
             createTagButtons('generalTags', tags.general);
 
             // Add event listeners for action buttons
@@ -441,13 +477,19 @@ textarea::placeholder {
             updateRiskSuggestion();
         });
 
-        // Function to create tag buttons
+         // Function to create tag buttons
         function createTagButtons(containerId, tagList) {
             const container = document.getElementById(containerId);
             tagList.forEach(tag => {
                 const button = document.createElement('button');
                 button.className = 'tag-button inactive';
                 button.id = tag.id;
+
+                // Add data-na attribute for N/A buttons
+                if (tag.id.includes('_NA')) {
+                    button.setAttribute('data-na', 'true');
+                }
+
                 button.innerHTML = `<span class="tool-icon">+</span> ${tag.text}`;
                 button.addEventListener('click', function() {
                     toggleTag(tag.id);
@@ -456,34 +498,48 @@ textarea::placeholder {
             });
         }
 
-        // Function to toggle a tag's active state
-        function toggleTag(tagId) {
-            const button = document.getElementById(tagId);
-            const tagText = tags.admin.concat(tags.vouched, tags.castle, tags.sardine, tags.general)
-                .find(tag => tag.id === tagId).text;
+// Function to toggle a tag's active state
+function toggleTag(tagId) {
+    const button = document.getElementById(tagId);
+    const tagText = tags.admin.concat(tags.vouched, tags.castle, tags.sardine, tags.social, tags.general)
+        .find(tag => tag.id === tagId).text;
 
-            if (activeTags.has(tagId)) {
-                // Remove tag
-                activeTags.delete(tagId);
-                button.className = 'tag-button inactive';
-                button.innerHTML = `<span class="tool-icon">+</span> ${tagText}`;
-            } else {
-                // Add tag
-                activeTags.add(tagId);
+    if (activeTags.has(tagId)) {
+        // Remove tag
+        activeTags.delete(tagId);
+        button.className = 'tag-button inactive';
 
-                // Determine risk level based on emoji in note template
-                const noteTemplate = noteTemplates[tagId];
-                let riskClass = 'low-risk'; // Default to low risk
+        // Add data-na attribute back if it's an N/A button
+        if (tagId.includes('_NA')) {
+            button.setAttribute('data-na', 'true');
+        }
 
-                if (noteTemplate.includes('🚨')) {
-                    riskClass = 'high-risk';
-                } else if (noteTemplate.includes('⚠️')) {
-                    riskClass = 'medium-risk';
-                }
+        button.innerHTML = `<span class="tool-icon">+</span> ${tagText}`;
+    } else {
+        // Add tag
+        activeTags.add(tagId);
 
-                button.className = `tag-button active ${riskClass}`;
-                button.innerHTML = `<span class="tool-icon">-</span> ${tagText}`;
+        // Determine styling for N/A vs risk-based buttons
+        if (tagId.includes('_NA')) {
+            // N/A buttons get grey styling
+            button.className = 'tag-button active';
+            button.setAttribute('data-na', 'true');
+        } else {
+            // Regular buttons get risk-based styling
+            const noteTemplate = noteTemplates[tagId];
+            let riskClass = 'low-risk'; // Default to low risk
+
+            if (noteTemplate.includes('🚨')) {
+                riskClass = 'high-risk';
+            } else if (noteTemplate.includes('⚠️')) {
+                riskClass = 'medium-risk';
             }
+
+            button.className = `tag-button active ${riskClass}`;
+        }
+
+        button.innerHTML = `<span class="tool-icon">-</span> ${tagText}`;
+    }
 
             // Show/hide castle rules input
 const castleRulesSection = document.getElementById('castleRulesSection');
@@ -505,18 +561,18 @@ if (tagId === 'castle_suspicious_login' && activeTags.has('castle_suspicious_log
 
             // Show/hide social links input
             const socialLinksSection = document.getElementById('socialLinksSection');
-            if (tagId === 'general_good_socials' && activeTags.has('general_good_socials')) {
+            if (tagId === 'social_good_socials' && activeTags.has('social_good_socials')) {
                 socialLinksSection.style.display = 'block';
-            } else if (tagId === 'general_good_socials' && !activeTags.has('general_good_socials')) {
+            } else if (tagId === 'social_good_socials' && !activeTags.has('social_good_socials')) {
                 socialLinksSection.style.display = 'none';
                 document.getElementById('socialLinksInput').value = '';
             }
 
             // Show/hide adverse media input
             const adverseMediaSection = document.getElementById('adverseMediaSection');
-            if (tagId === 'general_adverse_media' && activeTags.has('general_adverse_media')) {
+            if (tagId === 'social_adverse_media' && activeTags.has('social_adverse_media')) {
                 adverseMediaSection.style.display = 'block';
-            } else if (tagId === 'general_adverse_media' && !activeTags.has('general_adverse_media')) {
+            } else if (tagId === 'social_adverse_media' && !activeTags.has('social_adverse_media')) {
                 adverseMediaSection.style.display = 'none';
                 document.getElementById('adverseMediaInput').value = '';
             }
@@ -576,35 +632,45 @@ if (tagId === 'castle_suspicious_login' && activeTags.has('castle_suspicious_log
             }
         }
 
-        // Update risk suggestion display
-        function updateRiskSuggestion() {
-            const suggestion = document.getElementById('riskSuggestion');
+// Update risk suggestion display
+function updateRiskSuggestion() {
+    const suggestion = document.getElementById('riskSuggestion');
 
-            // Count risk indicators
-            const riskCount = Array.from(activeTags).filter(tag =>
-                noteTemplates[tag].includes('⚠️') || noteTemplates[tag].includes('🚨')
-            ).length;
+    // Get all active tags that have risk indicators (🚨, ⚠️, or ✅)
+    const riskTags = Array.from(activeTags).filter(tag => {
+        const template = noteTemplates[tag];
+        return template && (template.includes('🚨') || template.includes('⚠️') || template.includes('✅'));
+    });
 
-            const criticalCount = Array.from(activeTags).filter(tag =>
-                noteTemplates[tag].includes('🚨')
-            ).length;
+    // If no risk-related tags are active, clear the suggestion
+    if (riskTags.length === 0) {
+        suggestion.textContent = '';
+        return;
+    }
 
-            if (activeTags.size === 0) {
-                suggestion.textContent = '';
-            } else if (criticalCount > 0) {
-                // 🚨 HIGH RISK takes priority over everything
-                suggestion.textContent = `🚨 HIGH RISK SUGGESTION: ${criticalCount} critical alert(s) detected. Consider rejection or further investigation.`;
-                suggestion.style.color = '#e74c3c';
-            } else if (riskCount > 0 && !activeTags.has('general_good_socials')) {
-                // ⚠️ MEDIUM RISK unless Good Socials is selected
-                suggestion.textContent = `⚠️ MEDIUM RISK SUGGESTION: ${riskCount} warning(s) noted. Additional verification recommended.`;
-                suggestion.style.color = '#f39c12';
-            } else {
-                // ✅ LOW RISK (either no risks or Good Socials overrides medium risks)
-                suggestion.textContent = `✅ LOW RISK SUGGESTION: No significant fraud indicators detected. Approval suggested.`;
-                suggestion.style.color = '#2ecc71';
-            }
-        }
+    // Count risk indicators
+    const riskCount = Array.from(activeTags).filter(tag =>
+        noteTemplates[tag] && (noteTemplates[tag].includes('⚠️') || noteTemplates[tag].includes('🚨'))
+    ).length;
+
+    const criticalCount = Array.from(activeTags).filter(tag =>
+        noteTemplates[tag] && noteTemplates[tag].includes('🚨')
+    ).length;
+
+    if (criticalCount > 0) {
+        // 🚨 HIGH RISK takes priority over everything
+        suggestion.textContent = `🚨 HIGH RISK SUGGESTION: ${criticalCount} critical alert(s) detected. Consider rejection or further investigation.`;
+        suggestion.style.color = '#e74c3c';
+    } else if (riskCount > 0 && !activeTags.has('social_good_socials')) {
+        // ⚠️ MEDIUM RISK unless Good Socials is selected
+        suggestion.textContent = `⚠️ MEDIUM RISK SUGGESTION: ${riskCount} warning(s) noted. Additional verification recommended.`;
+        suggestion.style.color = '#f39c12';
+    } else {
+        // ✅ LOW RISK (either no risks or Good Socials overrides medium risks)
+        suggestion.textContent = `✅ LOW RISK SUGGESTION: No significant fraud indicators detected. Approval suggested.`;
+        suggestion.style.color = '#2ecc71';
+    }
+}
 
         // Function to update the generated notes
         function updateNotes() {
@@ -615,7 +681,7 @@ if (tagId === 'castle_suspicious_login' && activeTags.has('castle_suspicious_log
                 return;
             }
 
-            let notes = "PENDING NOTES:\n\n";
+            let notes = "PENDING REVIEW:\n\n";
 
             // Group notes by tool
             const toolNotes = {
@@ -623,6 +689,7 @@ if (tagId === 'castle_suspicious_login' && activeTags.has('castle_suspicious_log
                 vouched: [],
                 castle: [],
                 sardine: [],
+                social: [],
                 general: []
             };
 
@@ -636,126 +703,130 @@ if (tagId === 'castle_suspicious_login' && activeTags.has('castle_suspicious_log
                     toolNotes.castle.push(noteTemplates[tagId]);
                 } else if (tagId.startsWith('sardine_')) {
                     toolNotes.sardine.push(noteTemplates[tagId]);
+                } else if (tagId.startsWith('social_')) {
+                    toolNotes.social.push(noteTemplates[tagId]);
                 } else if (tagId.startsWith('general_')) {
                     toolNotes.general.push(noteTemplates[tagId]);
                 }
             });
 
-            // Add notes for each tool if they have any
-            if (toolNotes.admin.length > 0) {
-                notes += "ADMIN FINDINGS:\n";
-                toolNotes.admin.forEach(note => {
-                    notes += `• ${note}\n`;
-                });
-                notes += "\n";
-            }
-
-            if (toolNotes.vouched.length > 0) {
-                notes += "VOCHED ANALYSIS:\n";
-                toolNotes.vouched.forEach(note => {
-                    notes += `• ${note}\n`;
-                });
-                notes += "\n";
-            }
-
-            if (toolNotes.castle.length > 0) {
-                notes += "CASTLE ANALYSIS:\n";
-                toolNotes.castle.forEach(note => {
-                    notes += `• ${note}\n`;
-                });
-                notes += "\n";
-            }
-
-            if (toolNotes.castle.length > 0) {
-    notes += "CASTLE ANALYSIS:\n";
-    toolNotes.castle.forEach(note => {
-        notes += `• ${note}\n`;
-    });
-
-    // Add castle rules if Suspicious Login Activity is selected and rules are provided
-    if (activeTags.has('castle_suspicious_login')) {
-        const castleRules = document.getElementById('castleRulesInput').value.trim();
-        if (castleRules) {
-            const rulesArray = castleRules.split('\n').filter(rule => rule.trim() !== '');
-            if (rulesArray.length > 0) {
-                notes += `• Castle Suspicious Login Rules Detected:\n`;
-                rulesArray.forEach(rule => {
-                    notes += `  - ${rule.trim()}\n`;
-                });
-            }
-        }
+               // Add notes for each tool if they have any
+    if (toolNotes.admin.length > 0) {
+        notes += "Related Organizations:\n";
+        toolNotes.admin.forEach(note => {
+            notes += `• ${note}\n`;
+        });
+        notes += "\n";
     }
-    notes += "\n";
-}
 
-            if (toolNotes.sardine.length > 0) {
-                notes += "SARDINE ANALYSIS:\n";
-                toolNotes.sardine.forEach(note => {
-                    notes += `• ${note}\n`;
-                });
+    if (toolNotes.vouched.length > 0) {
+        notes += "Vouched:\n";
+        toolNotes.vouched.forEach(note => {
+            notes += `• ${note}\n`;
+        });
+        notes += "\n";
+    }
 
-                // Add sardine rules if Suspicious Flags is selected and rules are provided
-                if (activeTags.has('sardine_suspicious_flags')) {
-                    const sardineRules = document.getElementById('sardineRulesInput').value.trim();
-                    if (sardineRules) {
-                        const rulesArray = sardineRules.split('\n').filter(rule => rule.trim() !== '');
-                        if (rulesArray.length > 0) {
-                            notes += `• Sardine Suspicious Rules Detected:\n`;
-                            rulesArray.forEach(rule => {
-                                notes += `  - ${rule.trim()}\n`;
-                            });
-                        }
-                    }
+    if (toolNotes.castle.length > 0) {
+        notes += "Castle:\n";
+        toolNotes.castle.forEach(note => {
+            notes += `• ${note}\n`;
+        });
+
+        // Add castle rules if Suspicious Login Activity is selected and rules are provided
+        if (activeTags.has('castle_suspicious_login')) {
+            const castleRules = document.getElementById('castleRulesInput').value.trim();
+            if (castleRules) {
+                const rulesArray = castleRules.split('\n').filter(rule => rule.trim() !== '');
+                if (rulesArray.length > 0) {
+                    notes += `• Castle Suspicious Login Rules Detected:\n`;
+                    rulesArray.forEach(rule => {
+                        notes += `  - ${rule.trim()}\n`;
+                    });
                 }
-                notes += "\n";
             }
-
-if (toolNotes.general.length > 0) {
-    toolNotes.general.forEach(note => {
-        notes += `• ${note}\n`;
-    });
-
-                // Add social links if Good Socials is selected
-                if (activeTags.has('general_good_socials')) {
-                    const socialLinks = document.getElementById('socialLinksInput').value.trim();
-                    if (socialLinks) {
-                        const linksArray = socialLinks.split('\n').filter(link => link.trim() !== '');
-                        if (linksArray.length > 0) {
-                            notes += `• Social Media Links:\n`;
-                            linksArray.forEach(link => {
-                                notes += `  - ${link.trim()}\n`;
-                            });
-                        }
-                    }
-                }
-
-                // Add adverse media links if Adverse Media is selected
-                if (activeTags.has('general_adverse_media')) {
-                    const adverseMediaLinks = document.getElementById('adverseMediaInput').value.trim();
-                    if (adverseMediaLinks) {
-                        const linksArray = adverseMediaLinks.split('\n').filter(link => link.trim() !== '');
-                        if (linksArray.length > 0) {
-                            notes += `• Adverse Media Sources:\n`;
-                            linksArray.forEach(link => {
-                                notes += `  - ${link.trim()}\n`;
-                            });
-                        }
-                    }
-                }
-                notes += "\n";
-            }
-
-            // Add analyst decision to the notes if one is made
-            if (analystDecision.action) {
-                notes += `\nANALYST DECISION: ${analystDecision.action.toUpperCase()}`;
-                if (analystDecision.action === 'approve' && analystDecision.tier) {
-                    notes += ` - TIER ${analystDecision.tier}`;
-                }
-                notes += "\n\n";
-            }
-
-            notesContainer.textContent = notes;
         }
+        notes += "\n";
+    }
+
+    if (toolNotes.sardine.length > 0) {
+        notes += "Sardine:\n";
+        toolNotes.sardine.forEach(note => {
+            notes += `• ${note}\n`;
+        });
+
+        // Add sardine rules if Suspicious Flags is selected and rules are provided
+        if (activeTags.has('sardine_suspicious_flags')) {
+            const sardineRules = document.getElementById('sardineRulesInput').value.trim();
+            if (sardineRules) {
+                const rulesArray = sardineRules.split('\n').filter(rule => rule.trim() !== '');
+                if (rulesArray.length > 0) {
+                    notes += `• Sardine Suspicious Rules Detected:\n`;
+                    rulesArray.forEach(rule => {
+                        notes += `  - ${rule.trim()}\n`;
+                    });
+                }
+            }
+        }
+        notes += "\n";
+    }
+
+    if (toolNotes.social.length > 0) {
+        notes += "Online Presence/Socials:\n";
+        toolNotes.social.forEach(note => {
+            notes += `• ${note}\n`;
+        });
+
+        // Add social links if Good Socials is selected
+        if (activeTags.has('social_good_socials')) {
+            const socialLinks = document.getElementById('socialLinksInput').value.trim();
+            if (socialLinks) {
+                const linksArray = socialLinks.split('\n').filter(link => link.trim() !== '');
+                if (linksArray.length > 0) {
+                    notes += `• Social Media Links:\n`;
+                    linksArray.forEach(link => {
+                        notes += `  - ${link.trim()}\n`;
+                    });
+                }
+            }
+        }
+
+        // Add adverse media links if Adverse Media is selected
+        if (activeTags.has('social_adverse_media')) {
+            const adverseMediaLinks = document.getElementById('adverseMediaInput').value.trim();
+            if (adverseMediaLinks) {
+                const linksArray = adverseMediaLinks.split('\n').filter(link => link.trim() !== '');
+                if (linksArray.length > 0) {
+                    notes += `• Adverse Media Sources:\n`;
+                    linksArray.forEach(link => {
+                        notes += `  - ${link.trim()}\n`;
+                    });
+                }
+            }
+        }
+
+        notes += "\n";
+    }
+
+    if (toolNotes.general.length > 0) {
+        notes += "General Findings:\n";
+        toolNotes.general.forEach(note => {
+            notes += `• ${note}\n`;
+        });
+        notes += "\n";
+    }
+
+    // Add analyst decision to the notes if one is made
+    if (analystDecision.action) {
+        notes += `\nANALYST DECISION: ${analystDecision.action.toUpperCase()}`;
+        if (analystDecision.action === 'approve' && analystDecision.tier) {
+            notes += ` - TIER ${analystDecision.tier}`;
+        }
+        notes += "\n\n";
+    }
+
+    notesContainer.textContent = notes;
+}
 
         // Function to copy notes to clipboard
         function copyNotes() {
@@ -772,40 +843,46 @@ if (toolNotes.general.length > 0) {
             });
         }
 
-        // Function to clear all tags
-        function clearAllTags() {
-            activeTags.clear();
+// Function to clear all tags
+function clearAllTags() {
+    activeTags.clear();
 
-            // Reset all buttons to inactive state
-            document.querySelectorAll('.tag-button').forEach(button => {
-                button.className = 'tag-button inactive';
-                const tagId = button.id;
-                const tagText = tags.admin.concat(tags.vouched, tags.castle, tags.sardine, tags.general)
-                    .find(tag => tag.id === tagId).text;
-                button.innerHTML = `<span class="tool-icon">+</span> ${tagText}`;
-            });
+    // Reset all buttons to inactive state
+    document.querySelectorAll('.tag-button').forEach(button => {
+        button.className = 'tag-button inactive';
+        const tagId = button.id;
+        const tagText = tags.admin.concat(tags.vouched, tags.castle, tags.sardine, tags.social, tags.general)
+            .find(tag => tag.id === tagId).text;
 
-            // Hide all input sections and clear inputs
-            document.getElementById('castleRulesSection').style.display = 'none';
-document.getElementById('castleRulesInput').value = '';
-            document.getElementById('sardineRulesSection').style.display = 'none';
-            document.getElementById('sardineRulesInput').value = '';
-            document.getElementById('socialLinksSection').style.display = 'none';
-            document.getElementById('socialLinksInput').value = '';
-            document.getElementById('adverseMediaSection').style.display = 'none';
-            document.getElementById('adverseMediaInput').value = '';
-
-            // Clear analyst decision
-            analystDecision = { action: null, tier: null };
-            document.querySelectorAll('.decision-button, .tier-button').forEach(btn => {
-                btn.classList.remove('selected');
-            });
-            document.getElementById('tierSelection').style.display = 'none';
-            document.getElementById('decisionSummary').textContent = '';
-
-            updateNotes();
-            updateRiskSuggestion();
+        // Restore data-na attribute for N/A buttons
+        if (tagId.includes('_NA')) {
+            button.setAttribute('data-na', 'true');
         }
+
+        button.innerHTML = `<span class="tool-icon">+</span> ${tagText}`;
+    });
+
+    // Hide all input sections and clear inputs
+    document.getElementById('castleRulesSection').style.display = 'none';
+    document.getElementById('castleRulesInput').value = '';
+    document.getElementById('sardineRulesSection').style.display = 'none';
+    document.getElementById('sardineRulesInput').value = '';
+    document.getElementById('socialLinksSection').style.display = 'none';
+    document.getElementById('socialLinksInput').value = '';
+    document.getElementById('adverseMediaSection').style.display = 'none';
+    document.getElementById('adverseMediaInput').value = '';
+
+    // Clear analyst decision
+    analystDecision = { action: null, tier: null };
+    document.querySelectorAll('.decision-button, .tier-button').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+    document.getElementById('tierSelection').style.display = 'none';
+    document.getElementById('decisionSummary').textContent = '';
+
+    updateNotes();
+    updateRiskSuggestion();
+}
     </script>
 </body>
 </html>
